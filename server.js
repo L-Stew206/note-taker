@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3001;
 const { v4: uuidv4 } = require('uuid');
 
 //Global
-var notes = require('.db/db.json');
+let notes = require("./db/db.json");
 
 // Express (Middleware)
 app.use(express.json());
@@ -42,11 +42,16 @@ app.post('/api/notes', (req, res) => {
             text,
             id: uuidv4()
         };
+        const response = {
+            status: 'success',
+            body: newNote,
+        };
+        console.log(response);
         notes.push(newNote);
-        const noteString = JSON.stringify(newNote);
-        fs.writeFile(`db/db.json`, noteString, (err) =>
+        fs.writeFile("./db/db.json", JSON.stringify(notes), (err) =>
             err ? console.error(err) : console.log("success")
         );
+        console.log(newNote);
         res.status(201).json(newNote);
     } else {
         res.status(500).json('Error in posting note');
