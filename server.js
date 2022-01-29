@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3001;
 const { v4: uuidv4 } = require('uuid');
 
 //Global
-//var notes = require('.db/db.json');
+var notes = require('.db/db.json');
 
 // Express (Middleware)
 app.use(express.json());
@@ -16,7 +16,7 @@ app.use(express.static('public'));
 
 // Get HTML files
 app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
+    res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
 app.get('/notes', (req, res) => {
@@ -30,37 +30,36 @@ app.get('/api/notes', (req, res) => {
 });
 
 //Post request for notes from JSON
+//Create data
+//If the data matches
+//Varible for the object will save
 app.post('/api/notes', (req, res) => {
     console.info(`${req.method} request received to add a note`);
-    // Create data
     const { title, text } = req.body;
-    //If the data matches
     if (title && text) {
-        //Varible for the object will save
         const newNote = {
             title,
             text,
             id: uuidv4()
         };
+        notes.push(newNote);
+        const noteString = JSON.stringify(newNote);
+        fs.writeFile(`db/db.json`, noteString, (err) =>
+            err ? console.error(err) : console.log("success")
+        );
+        res.status(201).json(newNote);
+    } else {
+        res.status(500).json('Error in posting note');
     }
-    
-    
-    const newNote = req.body;
-    
-    
-    res.json('mesage for me')
-    
 });
 
-//order of operattions below for lines above
-// access the note data that was sent
-// create data
-// access the new note data from'req'
-//push it to my existsing list of notes
-// write my updated notes list to the 'db.json' file
-
-
-
+//Local port listening
 app.listen(PORT, () =>
     console.log(`Example app listening at http://localhost:${PORT}`)
 );
+
+//When user types anything they are returned to homepage
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/index.html'));
+});
+
